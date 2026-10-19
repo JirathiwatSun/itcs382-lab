@@ -39,7 +39,7 @@ public class ParcelService {
     public double pickUp(String code, int days) {
         for (Locker locker : lockers) {
             Parcel parcel = locker.getParcel();
-            if (parcel != null && parcel.getCode() == code) {
+            if (parcel != null && parcel.getCode().equals(code)) {
                 locker.setParcel(null);
                 parcel.status = "PICKED_UP";
                 saveToFile();
@@ -72,12 +72,12 @@ public class ParcelService {
     }
 
     private void saveToFile() {
-        try {
-            FileWriter writer = new FileWriter("parcels.csv");
+        try (FileWriter writer = new FileWriter("parcels.csv")) {
             for (Parcel parcel : parcels) {
                 writer.write(parcel.getCode() + "," + parcel.status + "\n");
             }
         } catch (IOException e) {
+            System.out.println("Could not save parcels: " + e.getMessage());
         }
     }
 }
