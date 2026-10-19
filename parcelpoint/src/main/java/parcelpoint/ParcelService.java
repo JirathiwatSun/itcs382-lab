@@ -10,9 +10,9 @@ public class ParcelService {
     private List<Parcel> parcels = new ArrayList<>();
 
     public ParcelService() {
-        lockers.add(new Locker(1, 1));
-        lockers.add(new Locker(2, 2));
-        lockers.add(new Locker(3, 3));
+        lockers.add(new Locker(1, ParcelSize.SMALL));
+        lockers.add(new Locker(2, ParcelSize.MEDIUM));
+        lockers.add(new Locker(3, ParcelSize.LARGE));
     }
 
     public List<Locker> getLockers() {
@@ -21,7 +21,7 @@ public class ParcelService {
 
     public Locker storeParcel(Parcel parcel) {
         for (Locker locker : lockers) {
-            if (locker.isFree() && locker.getSize() >= parcel.getSize()) {
+            if (locker.isFree() && parcel.getSize().fitsIn(locker.getSize())) {
                 locker.setParcel(parcel);
                 parcel.setStatus("STORED");
                 parcels.add(parcel);
@@ -51,21 +51,20 @@ public class ParcelService {
         if (days <= 3) {
             return 0;
         }
-        if (parcel.getSize() == 1) {
-            return (days - 3) * 10.0;
-        } else if (parcel.getSize() == 2) {
-            return (days - 3) * 15.0;
-        }
-        return (days - 3) * 20.0;
+        return (days - 3) * parcel.getSize().extraDayFee();
     }
 
-    public void printParcels(boolean forStaff) {
+    public void printWaiting() {
         for (Parcel parcel : parcels) {
-            if (forStaff) {
-                System.out.println(parcel.getCode() + " " + parcel.getStudentId() + " " + parcel.getStatus());
-            } else if (parcel.getStatus().equals("STORED")) {
+            if (parcel.getStatus().equals("STORED")) {
                 System.out.println(parcel.getCode() + " is waiting");
             }
+        }
+    }
+
+    public void printForStaff() {
+        for (Parcel parcel : parcels) {
+            System.out.println(parcel.getCode() + " " + parcel.getStudentId() + " " + parcel.getStatus());
         }
     }
 
